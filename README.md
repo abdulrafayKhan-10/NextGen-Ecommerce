@@ -17,6 +17,8 @@ Below is a visual walk-through of the main platform.
 <br><br>
 ![Checkout](assets/checkout.png)
 <br><br>
+![Admin Dashboard](assets/admin-dashboard.png)
+<br><br>
 ![About](assets/about.png)
 <br><br>
 ![Contact](assets/contact.png)
