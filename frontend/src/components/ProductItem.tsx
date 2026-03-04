@@ -54,7 +54,7 @@ const ProductItem: React.FC<ProductReadDto> = ({
           <h3 className='font-bold text-lg text-slate-800 line-clamp-1 group-hover:text-emerald-500 transition-colors'>{productTitle}</h3>
           <p className='text-sm text-slate-500 line-clamp-2 min-h-[40px]'>{description}</p>
           <div className='flex items-center justify-between mt-2'>
-            <p className='text-xl font-extrabold text-emerald-600'>$</p>
+            <p className='text-xl font-extrabold text-emerald-600'>${price.toFixed(2)}</p>
             <p className='text-xs font-semibold text-slate-400 uppercase tracking-wide bg-slate-100 px-2 py-1 rounded'>{brandName}</p>
           </div>
           <p className='text-xs font-medium text-slate-400 mt-1'>Stock: {quantity > 0 ? <span className='text-emerald-500'>{quantity}</span> : <span className='text-red-500'>Out of stock</span>}</p>
