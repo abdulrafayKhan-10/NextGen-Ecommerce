@@ -73,6 +73,9 @@ const Navbar = () => {
                 <Link to={'/orders'}>
                   <p className='cursor-pointer hover:text-emerald-400 transition-colors'>Orders</p>
                 </Link>
+                <Link to={'/admin'}>
+                  <p className='cursor-pointer text-amber-500 hover:text-amber-400 font-bold transition-colors'>Admin Panel</p>
+                </Link>
                 <Button onClick={handleLogout} className="!justify-start !p-0 !min-w-0" sx={{textTransform: 'none', color: 'inherit'}}>
                   <p className='cursor-pointer hover:text-red-400 transition-colors'>Logout</p>
                 </Button>

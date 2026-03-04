@@ -18,6 +18,7 @@ import Footer from './layout/Footer';
 import AdminRoutes from './routss/AdminRoutes';
 import AdminProfile from './pages/AdminProfile';
 import UserProfile from './pages/UserProfile';
+import Admin from './pages/Admin';
 // import ProtectedRoutes from './routss/ProtectedRoutes';
 
 const App = () => {
@@ -47,6 +48,9 @@ const App = () => {
           <Route path='/dashboard/admin' element={<AdminRoutes />}>
             <Route path='profile' element={<AdminProfile />} />
           </Route>
+          
+          {/* New Admin Page */}
+          <Route path='/admin' element={<Admin />} />
 
           {/* Catch-all route for 404 */}
           <Route path='*' element={<NotFound />} />
