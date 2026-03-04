@@ -27,6 +27,9 @@ const Product = () => {
           setProductImage(null);
         }
       }).catch(() => setProductImage(null));
+    }
+  }, [dispatch, id]);
+
   const handleAddToCart = () => {
     if (product) {
       const cartItem = {
