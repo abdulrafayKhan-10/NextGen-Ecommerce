@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import { fetchAllProduct, createProduct, updateProduct, deleteProduct } from '../services/productService';
+import { fetchAllProduct, createProduct, updateProduct, deleteProduct, addProductImage, deleteProductImages, getProductImages } from '../services/productService';
 import { ProductReadDto } from '../types/Product';
 import Title from '../components/Title';
-import { Edit, Trash, Plus, X } from 'lucide-react';
+import { Edit, Trash, Plus, X, Image as ImageIcon } from 'lucide-react';
 
 const Admin = () => {
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
@@ -23,7 +23,8 @@ const Admin = () => {
     price: 0,
     quantity: 0,
     categoryId: '1', // Adding a default mock
-    brandName: ''
+    brandName: '',
+    imageUrl: ''
   });
 
   const handleLogin = (e: React.FormEvent) => {
@@ -63,20 +64,32 @@ const Admin = () => {
       price: 0,
       quantity: 0,
       categoryId: '1',
-      brandName: ''
+      brandName: '',
+      imageUrl: ''
     });
     setIsModalOpen(true);
   };
 
-  const openEditModal = (product: ProductReadDto) => {
+  const openEditModal = async (product: ProductReadDto) => {
     setEditingId(product.id);
+    let existingImageUrl = '';
+    
+    // Try to grab the current image for this product
+    try {
+      const images = await getProductImages(product.id);
+      if (images && images.length > 0) {
+        existingImageUrl = images[0].imageURL || '';
+      }
+    } catch (e) {}
+
     setFormData({
       productTitle: product.productTitle,
       description: product.description,
       price: product.price,
       quantity: product.quantity,
       categoryId: product.categoryId || '1',
-      brandName: product.brandName || ''
+      brandName: product.brandName || '',
+      imageUrl: existingImageUrl
     });
     setIsModalOpen(true);
   };
@@ -96,13 +109,27 @@ const Admin = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      const { imageUrl, ...productPayload } = formData;
+      let targetProductId = editingId;
+
       if (editingId) {
-        await updateProduct(editingId, { ...formData, id: editingId, createdAt: new Date().toISOString() });
+        await updateProduct(editingId, { ...productPayload, id: editingId, createdAt: new Date().toISOString() });
         toast.success('Product updated successfully');
       } else {
-        await createProduct(formData);
+        const newProduct = await createProduct(productPayload);
+        targetProductId = newProduct.id;
         toast.success('Product created successfully');
       }
+
+      // Handle image updates
+      if (targetProductId && imageUrl) {
+        await deleteProductImages(targetProductId);
+        await addProductImage(targetProductId, imageUrl);
+      } else if (targetProductId && !imageUrl) {
+        // If image URL is emptied out, clear images
+        await deleteProductImages(targetProductId);
+      }
+
       setIsModalOpen(false);
       loadProducts();
     } catch (err) {
@@ -234,6 +261,21 @@ const Admin = () => {
                   onChange={e => setFormData({...formData, description: e.target.value})}
                   className="w-full border p-2 rounded h-24"
                 />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600 mb-1">Image URL</label>
+                <div className="flex gap-2">
+                  <input
+                    type="url"
+                    value={formData.imageUrl}
+                    onChange={e => setFormData({...formData, imageUrl: e.target.value})}
+                    placeholder="https://example.com/image.jpg"
+                    className="w-full border p-2 rounded"
+                  />
+                  {formData.imageUrl && (
+                    <img src={formData.imageUrl} alt="preview" className="h-10 w-10 object-cover rounded border" />
+                  )}
+                </div>
               </div>
               <div className="flex gap-4">
                 <div className="flex-1">

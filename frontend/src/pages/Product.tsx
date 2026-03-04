@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
 import { fetchProductThunk } from '../redux/thunks/productThunks';
+import { getProductImages } from '../services/productService';
 import { addToCart } from '../redux/slices/cartSlice';
 import { AppDispatch, RootState } from '../redux/store';
 import Title from '../components/Title';
@@ -14,13 +15,18 @@ const Product = () => {
   const { product, loading, error } = useSelector((state: RootState) => state.productR);
   
   const [quantity, setQuantity] = useState(1);
+  const [productImage, setProductImage] = useState<string | null>(null);
 
   useEffect(() => {
     if (id) {
       dispatch(fetchProductThunk(id));
-    }
-  }, [dispatch, id]);
-
+      getProductImages(id).then(images => {
+        if (images && images.length > 0) {
+          setProductImage(images[0].imageURL);
+        } else {
+          setProductImage(null);
+        }
+      }).catch(() => setProductImage(null));
   const handleAddToCart = () => {
     if (product) {
       const cartItem = {
@@ -57,7 +63,7 @@ const Product = () => {
         {/* Image Section */}
         <div className='md:w-1/2 p-10 bg-slate-50 flex items-center justify-center border-r border-slate-100'>
           <img 
-            src={assets.default_image || 'https://via.placeholder.com/500'} 
+            src={productImage || assets.default_image || 'https://via.placeholder.com/500'}
             alt={product.productTitle} 
             className='max-w-full h-auto object-contain drop-shadow-md hover:scale-105 transition-transform duration-500'
           />

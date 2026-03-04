@@ -82,3 +82,34 @@ export const deleteProduct = async (productId: string) => {
   const response = await axios.delete(`${API_URL}/products/${productId}`);
   return response.data;
 };
+// --- Product Images ---
+
+export const getProductImages = async (productId: string) => {
+  try {
+    const response = await axios.get(`${API_URL}/productimages/images/${productId}`);
+    return response.data;
+  } catch {
+    return [];
+  }
+};
+
+export const addProductImage = async (productId: string, imageUrl: string) => {
+  const response = await axios.post(`${API_URL}/productimages`, {
+    productId,
+    imageUrl,
+    isDefault: true,
+    imageText: 'Main Image'
+  });
+  return response.data;
+};
+
+export const deleteProductImages = async (productId: string) => {
+  try {
+    // Delete might need an ID or special endpoint, let's just clear by product ID if the backend supports it, 
+    // or just leave them. The Delete endpoint in backend is api/v1/ProductImages/delete/{productId}
+    const response = await axios.delete(`${API_URL}/productimages/delete/${productId}`);
+    return response.data;
+  } catch {
+    return false;
+  }
+};

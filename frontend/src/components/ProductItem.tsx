@@ -1,10 +1,10 @@
-import React from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { assets } from '../assets/assets';
 import { ProductReadDto } from '../types/Product';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { addToCart } from '../redux/slices/cartSlice';
-import { RootState } from '../redux/store';
+import { getProductImages } from '../services/productService';
 
 const ProductItem: React.FC<ProductReadDto> = ({
   id,
@@ -14,10 +14,18 @@ const ProductItem: React.FC<ProductReadDto> = ({
   quantity,
   brandName,
 }) => {
-  const { images, image, loading, error } = useSelector(
-    (state: RootState) => state.imageR
-  );
+  const [productImage, setProductImage] = useState<string | null>(null);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (id) {
+      getProductImages(id).then((images: any) => {
+        if (images && images.length > 0) {
+          setProductImage(images[0].imageURL);
+        }
+      }).catch(() => {});
+    }
+  }, [id]);
 
   const HandleAddToCart = () => {
     const product = {
@@ -31,23 +39,14 @@ const ProductItem: React.FC<ProductReadDto> = ({
     };
     dispatch(addToCart(product));
   };
-  console.log(images);
-  console.log(image);
-  if (loading) {
-    return <p>Loading images...</p>;
-  }
-
-  if (error) {
-    return <p>Error loading images: {error}</p>;
-  }
 
   return (
     <div className='flex flex-col h-full bg-white rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden border border-slate-100 group'>
-      <Link className='flex-grow focus:outline-none' to={`/products/${id}`}>
-        <div className='overflow-hidden relative pb-[100%] bg-slate-50'>
+      <Link className='flex-grow focus:outline-none' to={/products/ + id}>    
+        <div className='overflow-hidden relative pb-[100%] bg-slate-50'>        
           <img
             className='absolute top-0 left-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out'
-            src={assets.default_image}
+            src={productImage || assets.default_image}
             alt={productTitle}
           />
         </div>
@@ -55,7 +54,7 @@ const ProductItem: React.FC<ProductReadDto> = ({
           <h3 className='font-bold text-lg text-slate-800 line-clamp-1 group-hover:text-emerald-500 transition-colors'>{productTitle}</h3>
           <p className='text-sm text-slate-500 line-clamp-2 min-h-[40px]'>{description}</p>
           <div className='flex items-center justify-between mt-2'>
-            <p className='text-xl font-extrabold text-emerald-600'>${price.toFixed(2)}</p>
+            <p className='text-xl font-extrabold text-emerald-600'>$</p>
             <p className='text-xs font-semibold text-slate-400 uppercase tracking-wide bg-slate-100 px-2 py-1 rounded'>{brandName}</p>
           </div>
           <p className='text-xs font-medium text-slate-400 mt-1'>Stock: {quantity > 0 ? <span className='text-emerald-500'>{quantity}</span> : <span className='text-red-500'>Out of stock</span>}</p>
